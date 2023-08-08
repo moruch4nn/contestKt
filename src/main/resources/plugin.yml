@@ -1,3 +1,3 @@
-name: "プラグイン名"
-main: "メインクラスのパス"
+name: "ContestKt"
+main: "dev.mr3n.contestkt.ContestKt"
 version: "${version}"

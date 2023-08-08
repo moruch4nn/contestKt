@@ -16,6 +16,7 @@ repositories {
 }
 
 dependencies {
+    compileOnly("com.mojang:brigadier:1.0.18")
     compileOnly(dependencyNotation = "io.papermc.paper:paper-api:${project.property("paper.version")}")
     implementation("com.github.moruch4nn:paperallinone:${project.property("paperallinone.version")}")
     implementation("dev.jorel:commandapi-bukkit-kotlin:${project.property("commandapi.version")}")
