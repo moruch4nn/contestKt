@@ -3,10 +3,11 @@ package dev.mr3n.contestkt.commands
 import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.kotlindsl.*
 import dev.mr3n.contestkt.ContestInfo
+import dev.mr3n.contestkt.ManagementGui
 import dev.mr3n.contestkt.Storage
 import dev.mr3n.paperallinone.commands.failCommand
 import dev.mr3n.paperallinone.commands.successCommand
-import net.kyori.adventure.bossbar.BossBar
+import dev.mr3n.paperallinone.item.nbt
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import org.bukkit.Location
@@ -59,6 +60,13 @@ object ContestCommand {
                             }
                         }
                     }
+                    literalArgument("gui") {
+                        playerExecutor { player, args ->
+                            val contestId = args["contestId"] as String
+                            val contest = Storage.contests[contestId]?:player.failCommand(NamedTextColor.RED to "${contestId}に一致するコンテストは存在しません。")
+                            ManagementGui.managementGui(player, contest)
+                        }
+                    }
                     literalArgument("teleport") {
                         stringArgument("plotId") {
                             replaceSuggestions { info, builder -> ArgumentSuggestions.stringCollection<CommandSender> { Storage.contests[info.previousArgs["contestId"]?:return@stringCollection null]?.plots?.keys }.suggest(info, builder) }
@@ -74,10 +82,12 @@ object ContestCommand {
                     literalArgument("add") {
                         stringArgument("plotId") {
                             playerExecutor { player, args ->
+                                if(System.currentTimeMillis()-(player.nbt { long(Keys.LAST_CREATED) }?:0L) < 1000 * 60 * 10) { player.failCommand(NamedTextColor.RED to "コンテストステージを作成するには最大10分間待つ必要があります。") }
                                 val plotId = args["plotId"] as String
                                 val contestId = args["contestId"] as String
                                 val contest = Storage.contests[contestId]?:player.failCommand(NamedTextColor.RED to "${contestId}に一致するコンテストは存在しません。")
                                 contest.addPlot(player, plotId).genPlot()
+                                player.nbt { long(Keys.LAST_CREATED, System.currentTimeMillis()) }
                                 player.successCommand(NamedTextColor.BLUE to "プロットを追加しました。")
                             }
                         }
@@ -86,5 +96,9 @@ object ContestCommand {
             }
 
         }
+    }
+
+    enum class Keys {
+        LAST_CREATED
     }
 }
