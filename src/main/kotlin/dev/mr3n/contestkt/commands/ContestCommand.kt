@@ -55,6 +55,7 @@ object ContestCommand {
                                 val plotId = args["plotId"] as String
                                 val contest = Storage.contests[contestId]?:sender.failCommand(NamedTextColor.RED to "${contestId}に一致するコンテストは存在しません。")
                                 val plot = contest.plots[plotId]?:sender.failCommand(NamedTextColor.RED to "${plotId}に一致するプロットは存在しません。")
+                                if(plot.owner != sender.uniqueId) { sender.failCommand(NamedTextColor.RED to "操作できるのはプロットの所有者のみです。") }
                                 plot.open()
                                 sender.successCommand(NamedTextColor.BLUE to "プロットを開放しました。")
                             }
@@ -75,6 +76,7 @@ object ContestCommand {
                                 val plotId = args["plotId"] as String
                                 val contest = Storage.contests[contestId]?:player.failCommand(NamedTextColor.RED to "${contestId}に一致するコンテストは存在しません。")
                                 val plot = contest.plots[plotId]?:player.failCommand(NamedTextColor.RED to "${plotId}に一致するプロットは存在しません。")
+                                if(plot.owner != player.uniqueId) { player.failCommand(NamedTextColor.RED to "操作できるのはプロットの所有者のみです。") }
                                 plot.join(player)
                             }
                         }
